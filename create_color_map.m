@@ -1,19 +1,7 @@
-close all;
-clear;
-clc;
 
-% === Set Color ===
-colorNum = 4;
-colorGradStep = 5;
-
-% google
-custom_rgb = {
-    [66 133 244]
-    [219 68 55]
-    [244 180 0]
-    [15 157 88]
-    };
-
+function [] = create_color_map(titleName, colorGradStep, custom_rgb)
+% === Create Colormap ===
+colorNum = size(custom_rgb,1);
 custom_rgb_01 = cell(colorNum,1);
 custom_color_grad = cell(colorNum,1);
 
@@ -21,17 +9,19 @@ for i_color = 1:colorNum
     temp_custom_rgb_01 = zeros(colorGradStep,3);
     temp_custom_rgb_01(1,:) = custom_rgb{i_color}./255;
     for i_step = 2:colorGradStep
-        temp_custom_rgb_01(i_,:) = custom_rgb{i_color}./255;
-        custom_rgb_01{i_color,i_step} = custom_rgb_01{i_color,1}*i_step;
+        temp_custom_rgb_01(i_step,:) = temp_custom_rgb_01(1,:)*i_step;
     end
-    custom_rgb_01{i_color,1} = custom_rgb{i_color}./255;
+    temp_custom_rgb_01_rescale = zeros(colorGradStep,3);
+    for i_rgb = 1:3
+        temp_custom_rgb_01_rescale(:, i_rgb) = rescale(temp_custom_rgb_01(:,i_rgb), temp_custom_rgb_01(1,i_rgb), 1);
+    end
+    custom_rgb_01{i_color,1} = temp_custom_rgb_01_rescale;
     temp_color_array = zeros(colorGradStep,3);
     for i_step = 1:colorGradStep
-        temp_color_array(i_step,:) = custom_rgb01{i_color, i_step};
+        temp_color_array(i_step,:) = custom_rgb_01{i_color, 1}(i_step,:);
     end
     
     custom_color_grad{i_color} = temp_color_array;
-    
 end
 
 % === Visualization ===
@@ -49,7 +39,6 @@ for i_plot = 1:colorNum
     colormap(ax, custom_color_grad{i_plot});
 end
 
-titleName = "Google";
 sgt = sgtitle(titleName);
 sgt.FontSize = 25;
-sft.FontName = 'PT Mono';
+end
